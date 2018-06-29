@@ -1,0 +1,238 @@
+@charset "UTF-8";
+$lte7 : true;
+$prefixes : -webkit-,-moz-,-ms-,-o-,"";
+$img_path : '../../img';
+
+@mixin opacity($opacity:0.5){
+	filter : alpha(opacity=#{round($opacity*100)});
+	opacity: $opacity;
+}
+//rgba装换成16进制，用于IE Filter，如rgba(0,0,0,0.7)=>#B3000000
+@mixin rgbaCss($red,$green,$blue,$alpha:1){
+  background:rgba($red,$green,$blue,$alpha);
+  filter:progid:DXImageTransform.Microsoft.gradient(startcolorstr="#{ie-hex-str(rgba($red,$green,$blue,$alpha))}",endcolorstr="#{ie-hex-str(rgba($red,$green,$blue,$alpha))}");
+}
+@mixin mask(){
+	background: rgba(0,0,0,0.5);
+	filter: progid:DXImageTransform.Microsoft.gradient(startcolorstr=#7A000000,endcolorstr=#7A000000);
+}
+@mixin clearfix{
+	@if $lte7{
+		*zoom:1;
+	}
+	&:before,
+	&:after{
+		content:'';
+		display: table;
+		font:0/0 a;
+	}
+	&:after{
+		clear:both;
+	}
+}
+@mixin hide{
+	position:absolute;
+	padding: 0;
+	border: 0;
+	height: 0;
+	width: 0;
+	overflow: hidden;
+	@if $lte7{
+		clip:rect(1px 1px 1px 1px);
+	}
+	clip:rect(1px,1px,1px,1px);
+}
+@mixin ellipsis{
+	overflow: hidden;
+	text-overflow:ellipsis;
+	white-space: nowrap;
+}
+//css triangle
+@mixin tri($dir,$size,$color){
+	content:'';height: 0;width: 0;font-size:0;line-height:0;
+	@if $dir == top{
+		border-bottom:$size solid $color;
+		border-left:$size dashed transparent;
+		border-right:$size dashed transparent;
+	}
+	@else if $dir == right{
+		border-bottom:$size dashed transparent;
+		border-left:$size solid $color;
+		border-top:$size dashed transparent;
+	}
+	@else if $dir == left{
+		border-bottom:$size dashed transparent;
+		border-right:$size solid $color;
+		border-top:$size dashed transparent;
+	}
+	@else if $dir == bottom{
+		border-right:$size dashed transparent;
+		border-left:$size dashed transparent;
+		border-top:$size solid $color;
+	}
+}
+@mixin prefix($name,$argument){
+	@each $pre in $prefixes{
+		#{$pre}#{$name}:$argument;
+	}
+}
+@mixin btn{
+	color: #ffffff;
+	border-color: #1a67cb;
+	background-color: #2c8ce0;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#47a4f4), color-stop(5%, #2e8ee2), to(#2683d8));
+	background-image: -webkit-linear-gradient(#47a4f4, #2e8ee2 5%, #2683d8);
+	background-image: -moz-linear-gradient(top, #47a4f4, #2e8ee2 5%, #2683d8);
+	background-image: -o-linear-gradient(#47a4f4, #2e8ee2 5%, #2683d8);
+	background-image: linear-gradient(#47a4f4, #2e8ee2 5%, #2683d8);
+	background-repeat: no-repeat;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff47a4f4', endColorstr='#ff2683d8', GradientType=0);
+	&:hover{
+		background-color: #2788de;
+		background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#47a4f4), color-stop(5%, #2e8ee2), to(#0b72cc));
+		background-image: -webkit-linear-gradient(#47a4f4, #2e8ee2 5%, #0b72cc);
+		background-image: -moz-linear-gradient(top, #47a4f4, #2e8ee2 5%, #0b72cc);
+		background-image: -o-linear-gradient(#47a4f4, #2e8ee2 5%, #0b72cc);
+		background-image: linear-gradient(#47a4f4, #2e8ee2 5%, #0b72cc);
+		background-repeat: no-repeat;
+		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff47a4f4', endColorstr='#ff0b72cc', GradientType=0);
+	}
+}
+@mixin sprite-normal($name,$normal){
+  background-repeat: no-repeat;
+  background-image: sprite-url($normal);
+  background-position: sprite-position($normal,$name);
+  //background: url(sprite-url($normal)) no-repeat sprite-position($normal,$name);
+  height:image-height(sprite-file($normal, $name));
+  width: image-width(sprite-file($normal, $name));
+}
+
+//css3 动画
+$prefix-for-webkit:    true !default;
+$prefix-for-mozilla:   true !default;
+$prefix-for-microsoft: true !default;
+$prefix-for-opera:     true !default;
+$prefix-for-spec:      true !default;
+
+@mixin prefixer ($property, $value, $prefixes) {
+  @each $prefix in $prefixes {
+    @if $prefix == webkit {
+      @if $prefix-for-webkit {
+        -webkit-#{$property}: $value;
+      }
+    }
+    @else if $prefix == moz {
+      @if $prefix-for-mozilla {
+        -moz-#{$property}: $value;
+      }
+    }
+    @else if $prefix == ms {
+      @if $prefix-for-microsoft {
+        -ms-#{$property}: $value;
+      }
+    }
+    @else if $prefix == o {
+      @if $prefix-for-opera {
+        -o-#{$property}: $value;
+      }
+    }
+    @else if $prefix == spec {
+      @if $prefix-for-spec {
+        #{$property}: $value;
+      }
+    }
+    @else  {
+      @warn "Unrecognized prefix: #{$prefix}";
+    }
+  }
+}
+
+@mixin disable-prefix-for-all() {
+  $prefix-for-webkit:    false;
+  $prefix-for-mozilla:   false;
+  $prefix-for-microsoft: false;
+  $prefix-for-opera:     false;
+  $prefix-for-spec:      false;
+}
+// required for keyframe mixin
+@mixin keyframes($name) {
+  $original-prefix-for-webkit:    $prefix-for-webkit;
+  $original-prefix-for-mozilla:   $prefix-for-mozilla;
+  $original-prefix-for-microsoft: $prefix-for-microsoft;
+  $original-prefix-for-opera:     $prefix-for-opera;
+  $original-prefix-for-spec:      $prefix-for-spec;
+
+  @if $original-prefix-for-webkit {
+    @include disable-prefix-for-all();
+    $prefix-for-webkit: true;
+    @-webkit-keyframes #{$name} {
+      @content;
+    }
+  }
+  @if $original-prefix-for-mozilla {
+    @include disable-prefix-for-all();
+    $prefix-for-mozilla: true;
+    @-moz-keyframes #{$name} {
+      @content;
+    }
+  }
+  @if $original-prefix-for-spec {
+    @include disable-prefix-for-all();
+    $prefix-for-spec: true;
+    @keyframes #{$name} {
+      @content;
+    }
+  }
+
+  $prefix-for-webkit:    $original-prefix-for-webkit    ;
+  $prefix-for-mozilla:   $original-prefix-for-mozilla   ;
+  $prefix-for-microsoft: $original-prefix-for-microsoft ;
+  $prefix-for-opera:     $original-prefix-for-opera     ;
+  $prefix-for-spec:      $original-prefix-for-spec      ;
+}
+
+@mixin transform($property: none) {
+//  none | <transform-function>
+  @include prefixer(transform, $property, webkit moz ms o spec);
+}
+
+@mixin transition($property: none) {
+//  none | <transform-function>
+  @include prefixer(transition, $property, webkit moz ms o spec);
+}
+
+@mixin transform-origin($axes: 50%) {
+// x-axis - left | center | right  | length | %
+// y-axis - top  | center | bottom | length | %
+// z-axis -                          length
+  @include prefixer(transform-origin, $axes, webkit moz ms o spec);
+}
+
+@mixin transform-style ($style: flat) {
+  @include prefixer(transform-style, $style, webkit moz ms o spec);
+}
+
+@mixin animation ($animations) {
+  @include prefixer(animation, $animations, webkit moz spec);
+}
+
+@mixin iHack($name,$value){
+  -webkit-#{$name}:$value;
+  -moz-#{$name}:$value;
+  -o-#{$name}:$value;
+  #{$name}:$value;
+}
+
+//REM转换
+@function rem($i){
+  @return $i/50 + rem;  // html  font-size:50px
+}
+
+// 渐变
+@mixin radialGradient($color2,$color1){
+  background: $color1;
+  background: -webkit-radial-gradient($color1, $color2 100%); /* Safari 5.1 - 6.0 */
+  background: -o-radial-gradient($color1, $color2 100%); /* Opera 11.6 - 12.0 */
+  background: -moz-radial-gradient($color1, $color2 100%); /* Firefox 3.6 - 15 */
+  background: radial-gradient($color1, $color2 100%); /* 标准的语法（必须放在最后） */
+}

@@ -1,0 +1,15 @@
+blockquote,body,button,code,dd,div,dl,dt,fieldset,form,h1,h2,h3,h4,h5,h6,input,legend,li,ol,p,pre,select,td,textarea,th,ul{margin:0;padding:0}
+table{border-collapse:collapse;border-spacing:0}
+fieldset,img{border:0}
+del,ins{text-decoration:none}
+ol,ul{list-style:none}
+h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:400}
+q:after,q:before{content:""}
+em{font-style:normal}
+a{text-decoration:none}
+a:hover{text-decoration:none}
+input,select,textarea{font-family:inherit;font-size:inherit;font-weight:inherit}
+body{color:#333;font:12px/1.5 "Microsoft YaHei","Hiragino Sans GB","Microsoft JhengHei",SimSun,sans-serif;background-color:#FFF}
+.clearfix:after{content:" ";display:table}
+.clearfix:after{clear:both}
+.icon-logo_qqgame{background:url(../images/sprite-1441a7909c.png) no-repeat 0 0;background-size:145px 50px;width:145px;height:50px;display:inline-block}

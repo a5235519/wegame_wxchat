@@ -1,0 +1,16 @@
+//##################自定义函数##########################
+//图片地址处理
+@function imgSrc($src){
+  @return "../images/"+$src;
+}
+
+@import './functions';
+@import './reset';
+@import './sprite';
+
+/*------- 配置颜色 --------*/
+$primary: #e51c40;  //主色
+$minor: #8aacfe;  // 次要色
+$hint: #ff8b03;  // 提示色
+$text: #555;
+$info: #999;
