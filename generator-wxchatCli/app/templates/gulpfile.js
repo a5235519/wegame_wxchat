@@ -45,16 +45,22 @@ gulp.task('sprite', function () {
           let arr = [],
               width = data.spritesheet.px.width,
               height = data.spritesheet.px.height,
-              url =  data.spritesheet.image
+              url =  data.spritesheet.image;
+
+          arr.push(
+            ".icon-spr"+
+            "{"+
+                "background: url('"+url+"') "+
+                "no-repeat;"+
+                "background-size: "+ width+" "+height+";"+
+            "}\n"
+          )
           // console.log(data)
           data.sprites.forEach(function(sprite) {
               arr.push(
                   ".icon-"+sprite.name+
                   "{"+
-                      "background: url('"+url+"') "+
-                      "no-repeat "+
-                      sprite.px.offset_x+" "+sprite.px.offset_y+";"+
-                      "background-size: "+ width+" "+height+";"+
+                      "background-position: "+sprite.px.offset_x+" "+sprite.px.offset_y+";"+
                       "width: "+sprite.px.width+";"+                       
                       "height: "+sprite.px.height+";"+
                       "display: inline-block;" +
@@ -103,7 +109,6 @@ gulp.task('movecss', function () {
 
   return gulp.src(cssFile)
       .pipe(changed(outputCssFile))
-      .pipe(concatCSS("style.css"))
       .pipe(minifyCSS({
           advanced: false,//类型：Boolean 默认：true [是否开启高级优化（合并选择器等）]
           compatibility: '*',//保留ie7及以下兼容写法 类型：String 默认：''or'*' [启用兼容模式； 'ie7'：IE7兼容模式，'ie8'：IE8兼容模式，'*'：IE9+兼容模式]
@@ -130,14 +135,57 @@ gulp.task('moveimg', function () {
     .pipe(gulp.dest(outputImgFile+'tab'));
 });
 
-// 发布模式：HTML打包
+var initPagesJs = `
+  import Vue from 'vue';
+  import App from './%{pages}%';
+
+  const app = new Vue(App);
+  app.$mount();
+
+  export default {
+      config: {
+          disableScroll: false,
+          navigationStyle: 'default',
+      },
+  };
+`;
+
+var initPagesVue = `
+<template>%{html}%</template>
+
+<script>
+  export default {
+    data() {
+          
+    }
+  }
+</script> 
+
+<style>
+    
+</style>
+`;
+
+// 发布模式：根据HTML生成对用的pages，并且将内容添加其中
 gulp.task('devhtml', function(){
-  gulp.src(ipath.staticPath + '/*.html')
-    .pipe(contentIncluder({
-          includerReg:/<!\-\-include\s+"([^"]+)"\-\->/g,
-          deepConcat: true
-    }))
-   .pipe(gulp.dest(ipath.prdPath + '/'))
+  let src = './static/';
+  let devsrc = './src/pages/'
+  let pages = fs.readdirSync(src);
+  for(let i in pages){
+    // 检查是否为html文件
+    if(pages[i].indexOf('.html')<0) continue;
+    let _page = pages[i].replace('.html','');
+    let isPage = fs.existsSync(`${devsrc}${_page}`);    
+    // 检查page是否存在
+    if(isPage) continue;
+    // 创建目录
+    fs.mkdirSync(`${devsrc}${_page}`);
+    let pagesJs = initPagesJs.replace('%{pages}%', _page)
+    fs.writeFileSync(`${devsrc}${_page}/main.js`, pagesJs);
+    let readHtml = fs.readFileSync(`${src}${pages[i]}`).toString().match(/<body>([\w\W]*?)<\/body>/)[1];
+    let pagesVue = initPagesVue.replace('%{html}%', readHtml)    
+    fs.writeFileSync(`${devsrc}${_page}/${_page}.vue`, pagesVue)
+  }
 })
 
 // 项目部署
